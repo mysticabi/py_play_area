@@ -25,55 +25,66 @@ def print_board():
 
 #logic for deciding the winner
 def game_ended(player_inputs):
-    #print(player_inputs)
     winning_count = 0
-    #print('winning sequence');print(len(winning_sequence));
     for i in range(0,len(winning_sequence)):
-        #print('first winning sequence');print(len(winning_sequence[i]));print(winning_sequence[i])
         winning_count = 0
         for j in range(len(winning_sequence[i])):
             if winning_sequence[i][j] in player_inputs:
                 winning_count+=1
-                #print('winning count');print(winning_count)
             if winning_count >= 3: return True
+    return False
+
+def no_winner():
+    if not game_ended(player1) and not game_ended(player2):
+        if(game_count>=8): return True
     return False
 
 #logic for claiming a spot on the board
 def claim_spot(input,replace_with):
+    global game_count
     index = nums.index(input)
     nums[index] = replace_with
+    game_count+=1
+
+def take_input():
+    while(True):
+        input_val = input()
+        if input_val not in allowed_nums:
+            print("Please choose wisely")
+            #correct_input_chosen= True
+            continue
+        elif int(input_val) not in nums:
+            print("Number already taken. Choose Wisely!")
+            #correct_input_chosen= True
+            continue
+        return int(input_val)
 
 player1=[] #to store player 1's game
 player2=[] #to store player 2's game
 nums=[1,2,3,4,5,6,7,8,9]
-allowed_nums=[1,2,3,4,5,6,7,8,9]
+allowed_nums=['1','2','3','4','5','6','7','8','9']
 line_separator=" ---|---|---"
 col_separator=" |"
 winning_sequence=[[1,2,3],[4,5,6],[7,8,9],[1,5,9],[2,5,8],[1,4,7],[3,6,9],[3,5,7]]
 fresh_game=True
 still_on=True
-player2_playing= False #flag to recognize who is playing
-while(still_on):
-    #sp.call('clear',shell=True)
-    if not player2_playing:
-        print_board()
-        print("------------------------------------------")
-        print("-- Player 1: Choose a number to place X --")
-        print("------------------------------------------")
-        player1_input = int(input())
-        if player1_input not in allowed_nums:
-            print("Please choose wisely")
-            player2_playing= False
-            continue
-        if player1_input not in nums:
-            print("Number already taken. Choose Wisely!")
-            player2_playing= False
-            continue
-        player1.append(player1_input)
-        claim_spot(player1_input,'X')
-        print_board()
+game_count=0
+
+while(True):
+    if no_winner():
+        print("------------------------------")
+        print("No Winner, No Loser: Game Over")
+        print("------------------------------")
+        break
+    print_board()
+    print("------------------------------------------")
+    print("-- Player 1: Choose a number to place X --")
+    print("------------------------------------------")
+    player1_input = take_input()
+    player1.append(player1_input)
+    claim_spot(player1_input,'X')
+    print_board()
     if game_ended(player1):
-        still_on=False
         print("------------------------------------------")
         print("Game Ended -- Winner is : Player 1")
         print(player1)
@@ -82,22 +93,11 @@ while(still_on):
     print("------------------------------------------")
     print("-- Player 2: Choose a number to place O --")
     print("------------------------------------------")
-    player2_input = int(input())
-    if player2_input not in allowed_nums:
-        print("Please choose wisely")
-        player2_playing = True
-        continue
-    if player2_input not in nums:
-        print("Number already taken. Choose Wisely!")
-        player2_playing = True
-        continue
+    player2_input = take_input()
     player2.append(player2_input)
-    player2_playing = False
-    #player2.sort()
     claim_spot(player2_input,'O')
     print_board()
     if game_ended(player2):
-        still_on=False
         print("------------------------------------------")
         print("Game Ended -- Winner is : Player 2")
         print(player2)
